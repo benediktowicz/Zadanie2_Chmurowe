@@ -1,0 +1,34 @@
+version: "3"
+services:
+  redis:
+    build: ./redis
+    networks:
+      - backend
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+  nginx:
+    build: ./nginx_local
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+  gscalc:
+    build: ./gscalc
+    depends_on:
+      - redis
+      - nginx
+    networks:
+      - backend
+    restart: unless-stopped
+  strona_glowna:
+    build: ./strona_glowna
+    depends_on:
+      - nginx
+      - gscalc
+    networks:
+      - backend
+    restart: unless-stopped
+networks:
+  backend:

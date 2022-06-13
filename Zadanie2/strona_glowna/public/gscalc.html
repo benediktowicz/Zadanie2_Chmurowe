@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GS Calc</title>
+</head>
+
+<body>
+    <nav>
+        <a style="font-size: 20px; text-decoration: none;color: black;" href="/">Strona Główna</a>
+    </nav>
+    <div style="display: flex; justify-content: center; align-items: center;padding-top: 35vh;">
+        <div>
+            <form id="formularz" action="/api/gscalc" method="GET">
+                <input type="text" name="count" id="textfield" style="padding: 10px 20px; margin: 8px 0; box-sizing: border-box;" placeholder="Podaj k:"> <br>
+                <input type="submit" id="save" onclick="addHistory()" style="  background-color: blue; border-radius: 8px; border: none; color: white; padding: 10px 40px 10px; margin-left: 60px; text-align: center;
+                                              text-decoration: none; display: inline-block; font-size: 16px;" value="Oblicz">
+            </form>
+            <div>
+                <p id="result">Wynik: 0 </p>
+            </div>
+            <button onclick="myFunction()" style="  background-color: blue; border-radius: 8px; border: none; color: white; padding: 12px 17px 12px; margin-left: 60px; text-align: center;
+            text-decoration: none; display: inline-block; font-size: 16px;" >Show history</button>
+            <div id="history" style="display: none;">
+                <p>Wyniki:</p>
+                <div id="wynik"></div>
+                <p>Dane wpisane od użytkownika: </p>
+                <div id="inpValue"></div>
+            </div>
+
+        </div>
+    </div>
+</body>
+
+<script>
+    let countTab = [];
+    let b = 0;
+    document.getElementById("formularz").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        fetch("/api/gscalc?" + new URLSearchParams({
+            count: e.currentTarget.count.value
+        })).then(async data => {
+            const response = await data.json();
+            document.getElementById("result").innerHTML = `Wynik: ${response.result}`;
+            countTab.push(response.result);
+            const para = document.createElement("p");
+            const node = document.createTextNode(countTab[b]);
+            para.appendChild(node);
+            const element = document.getElementById("wynik");
+            element.appendChild(para);
+            b++;
+        }).catch(e => {
+            console.log(e);
+        })
+    });
+    let tab = [];
+    let a = 0;
+    function addHistory(){
+        let temp = document.getElementById("textfield").value;
+
+        if(temp <= 10){
+            tab.push(temp);
+
+            const para = document.createElement("p");
+            const node = document.createTextNode(tab[a]);
+            para.appendChild(node);
+            const element = document.getElementById("inpValue");
+            element.appendChild(para);
+            a++;
+        }else{
+            alert("Wpisana wartosc k jest większa od 10");
+        };
+
+    }
+
+    function myFunction() {
+        var x = document.getElementById("history");
+        if (x.style.display === "none") {
+            x.style.display = "block";
+        } else {
+            x.style.display = "none";
+    }
+}
+</script>
+
+</html>

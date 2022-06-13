@@ -1,0 +1,42 @@
+version: "3"
+services:
+  redis:
+    build: 
+      context: ./redis
+      dockerfile: Dockerfile.dev
+    networks:
+      - backend
+    volumes:
+      - ./data:/data
+    restart: unless-stopped
+  nginx:
+    build:
+      context: ./nginx_local
+      dockerfile: Dockerfile.dev
+    networks:
+      - backend
+    ports:
+      - "80:80"
+    restart: unless-stopped
+  gscalc:
+    build:
+      context: ./gscalc
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - redis
+      - nginx
+    networks:
+      - backend
+    restart: unless-stopped
+  strona_glowna:
+    build:
+      context: ./strona_glowna
+      dockerfile: Dockerfile.dev
+    depends_on:
+      - nginx
+      - gscalc
+    networks:
+      - backend
+    restart: unless-stopped
+networks:
+  backend:
